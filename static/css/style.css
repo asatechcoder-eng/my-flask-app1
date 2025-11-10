@@ -1,0 +1,358 @@
+/* === GLOBAL RESET === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #f0f4ff 0%, #e4edff 50%, #fefefe 100%);
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === LOGIN / FORGOT PASSWORD PAGE === */
+.login-container {
+  background: #fff;
+  padding: 40px 50px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  margin-top: 8%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: 0.3s;
+}
+
+.login-container:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 45px rgba(0, 0, 0, 0.1);
+}
+
+.login-container img {
+  width: 300px;
+  height: auto;
+  margin-bottom: 15px;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.login-container h1 {
+  font-size: 26px;
+  color: #2a3d8f;
+  margin-bottom: 25px;
+  letter-spacing: 0.8px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"],
+.login-container select {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #cdd4f7;
+  background: #f9fbff;
+  margin-bottom: 18px;
+  transition: 0.25s ease;
+}
+
+.login-container input:focus,
+.login-container select:focus {
+  border-color: #2a3d8f;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(42, 61, 143, 0.25);
+}
+
+.login-container button {
+  width: 100%;
+  background: #2a3d8f;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.5px;
+}
+
+.login-container button:hover {
+  background: #1f2d73;
+  transform: scale(1.03);
+}
+
+.login-container p {
+  margin-top: 18px;
+  font-size: 14px;
+  color: #666;
+}
+
+.login-container a {
+  color: #2a3d8f;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-container a:hover {
+  text-decoration: underline;
+}
+
+/* === NAVBAR === */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2a3d8f;
+  color: white;
+  padding: 12px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-left img.logo {
+  height: 42px;
+  width: auto;
+}
+
+.navbar-left span {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.navbar-right form {
+  display: inline;
+  margin-left: 8px;
+}
+
+.btn-download, .btn-logout {
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-download {
+  background-color: #00a86b;
+  color: #fff;
+}
+
+.btn-download:hover {
+  background-color: #01945f;
+  transform: scale(1.05);
+}
+
+.btn-logout {
+  background-color: #ff5c5c;
+  color: #fff;
+}
+
+.btn-logout:hover {
+  background-color: #e74c3c;
+  transform: scale(1.05);
+}
+
+/* === FLASH MESSAGE === */
+.flash-msg {
+  font-size: 14px;
+  color: #00a86b;
+  background: #e9f9ef;
+  border: 1px solid #b5f0c8;
+  padding: 10px 16px;
+  border-radius: 6px;
+  margin: 20px auto 0 auto;
+  width: 90%;
+  max-width: 1200px;
+  text-align: center;
+}
+
+/* === TABLE STYLING === */
+.table-wrapper {
+  overflow-x: auto;
+  margin: 20px auto;
+  width: 95%;
+  max-width: 1400px;
+}
+
+table {
+  border-collapse: collapse;
+  background: #fff;
+  width: 100%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+th {
+  background: #2a3d8f;
+  color: #fff;
+  padding: 12px 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 14px;
+  border-bottom: 2px solid #1f2d73;
+}
+
+td {
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+  border-bottom: 1px solid #eaeaea;
+}
+
+tr:hover {
+  background-color: #f5f8ff;
+  transition: background 0.25s ease-in-out;
+}
+
+tr.add-row {
+  background-color: #e0f7fa;
+}
+
+tr.edit-row {
+  background-color: #fff7e6;
+}
+
+/* === INPUTS AND SELECTS (for DataTable) === */
+input[type="text"],
+input[type="date"],
+select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ccd6f6;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: 0.2s;
+  background: #f9fbff;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #2a3d8f;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(42, 61, 143, 0.2);
+}
+
+/* === BUTTONS === */
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.btn-add {
+  background-color: #2a3d8f;
+  color: #fff;
+  display: block;
+  margin: 20px auto;
+}
+
+.btn-edit {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.btn-delete {
+  background-color: #ff5c5c;
+  color: #fff;
+}
+
+.btn-save {
+  background-color: #00a86b;
+  color: #fff;
+}
+
+.btn-cancel {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* === FOOTER === */
+footer {
+  margin-top: auto;
+  padding: 15px 0;
+  text-align: center;
+  font-size: 13px;
+  color: #666;
+  background-color: #f7f9ff;
+  width: 100%;
+  border-top: 1px solid #e4e9f7;
+}
+
+footer a {
+  color: #2a3d8f;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+@keyframes tableRowFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .table-wrapper {
+    width: 98%;
+  }
+  th, td {
+    font-size: 12px;
+    padding: 8px;
+  }
+  button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .login-container {
+    padding: 30px 25px;
+    max-width: 90%;
+    margin-top: 25%;
+  }
+}

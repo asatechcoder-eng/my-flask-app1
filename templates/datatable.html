@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Billing Adjustments</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="navbar-left">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo" onerror="this.style.display='none'">
+
+      {% if session.get('is_admin') %}
+        <span>Admin – All Centers</span>
+      {% else %}
+        <span>Center: {{ center_of_admin }}</span>
+      {% endif %}
+    </div>
+
+    <div class="navbar-right">
+      <!-- ✅ Excel download includes filter -->
+      <form method="get" action="/download_excel" style="display:inline;">
+        {% if session.get('is_admin') %}
+          <input type="hidden" name="selected_center" value="{{ center_of_admin }}">
+        {% endif %}
+        <button type="submit" class="btn-download">⬇️ Excel</button>
+      </form>
+
+      <form method="post" action="/logout" style="display:inline;">
+        <button type="submit" class="btn-logout">Logout</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Flash Message -->
+  {% if msg %}
+    <div class="flash-msg">{{ msg }}</div>
+  {% endif %}
+
+  <!-- Center Filter (Visible only for Admin) -->
+  {% if session.get('is_admin') %}
+  <form method="post" style="text-align:center; margin-top: 20px;">
+    <label for="center-filter" style="font-weight:600;">Filter by Center:</label>
+    <select name="selected_center" id="center-filter" onchange="this.form.submit()" style="padding:5px 10px; border-radius:6px;">
+      <option value="">All Centers</option>
+      {% for c in centers %}
+        <option value="{{ c }}" {% if center_of_admin == c %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  {% endif %}
+
+  <!-- MAIN TABLE -->
+  <form method="post">
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            {% for col in columns %}
+              <th>{{ col }}</th>
+            {% endfor %}
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for idx, row in data.iterrows() %}
+            {% if mode == 'edit' and edit_idx == idx %}
+              <!-- Edit Row -->
+              <tr class="edit-row">
+                <td>{{ row_data['UID'] }}</td>
+                <td>{{ row_data['Timestamp'] }}</td>
+                <td>
+                  <select name="Center Name" id="edit-center-dropdown" onchange="filterChildren('edit')">
+                    {% for c in centers %}
+                      <option value="{{ c }}" {% if row_data['Center Name'] == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                  </select>
+                </td>
+                <td>
+                  <select name="Child Name" id="edit-child-dropdown" onchange="updateAutoFields('edit')">
+                    {% for s in center_children[row_data['Center Name']] %}
+                      <option value="{{ s }}" {% if row_data['Child Name'] == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                  </select>
+                </td>
+                <td><input type="text" name="Adjustment Amount" value="{{ row_data['Adjustment Amount'] }}"></td>
+                <td><input type="text" name="Note/Description" value="{{ row_data['Note/Description'] }}"></td>
+                <td><input type="text" name="Pulling Instruction" value="{{ row_data['Pulling Instruction'] }}"></td>
+                <td>
+                  <select name="Pulling Category">
+                    <option value="pull" {% if row_data['Pulling Category']=='pull' %}selected{% endif %}>pull</option>
+                    <option value="don't pull" {% if row_data['Pulling Category']=="don't pull" %}selected{% endif %}>don't pull</option>
+                  </select>
+                </td>
+                <td><input type="date" name="Start Date" value="{{ row_data['Start Date'] }}"></td>
+                <td><input type="date" name="End Date" value="{{ row_data['End Date'] }}"></td>
+                <td>
+                  <select name="Adjustment is Recurring">
+                    <option value="Monthly" {% if row_data['Adjustment is Recurring']=='Monthly' %}selected{% endif %}>Monthly</option>
+                    <option value="One Time" {% if row_data['Adjustment is Recurring']=='One Time' %}selected{% endif %}>One Time</option>
+                  </select>
+                </td>
+                <td id="edit-child-status">{{ row_data['Child Status'] }}</td>
+                <td id="edit-family-status">{{ row_data['Family Status'] }}</td>
+                <td id="edit-billing-cycle">{{ row_data['Billing Cycle'] }}</td>
+                <td>
+                  <input type="hidden" name="row_idx" value="{{ edit_idx }}">
+                  <button type="submit" name="save_edit" class="btn-save">Save</button>
+                  <button type="submit" name="cancel_action" class="btn-cancel">Cancel</button>
+                </td>
+              </tr>
+
+            {% else %}
+              <!-- View Row -->
+              <tr>
+                {% for col in columns %}
+                  <td>{{ row[col] }}</td>
+                {% endfor %}
+                <td>
+                  <button type="submit" name="edit_row_idx" value="{{ idx }}" class="btn-edit">Edit</button>
+                  <button type="submit" name="delete_row_idx" value="{{ idx }}" onclick="return confirm('Delete row?');" class="btn-delete">Delete</button>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+
+          {% if mode == 'add' %}
+          <!-- Add Row -->
+          <tr class="add-row">
+            <td>{{ row_data['UID'] }}</td>
+            <td>{{ row_data['Timestamp'] }}</td>
+            <td>
+              <select name="Center Name" id="add-center-dropdown" onchange="filterChildren('add')">
+                {% for c in centers %}
+                  <option value="{{ c }}" {% if row_data['Center Name'] == c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+              </select>
+            </td>
+            <td>
+              <select name="Child Name" id="add-child-dropdown" onchange="updateAutoFields('add')">
+                {% for s in center_children[row_data['Center Name']] %}
+                  <option value="{{ s }}" {% if row_data['Child Name'] == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+              </select>
+            </td>
+            <td><input type="text" name="Adjustment Amount"></td>
+            <td><input type="text" name="Note/Description"></td>
+            <td><input type="text" name="Pulling Instruction"></td>
+            <td>
+              <select name="Pulling Category">
+                <option value="pull">pull</option>
+                <option value="don't pull">don't pull</option>
+              </select>
+            </td>
+            <td><input type="date" name="Start Date"></td>
+            <td><input type="date" name="End Date"></td>
+            <td>
+              <select name="Adjustment is Recurring">
+                <option value="Monthly">Monthly</option>
+                <option value="One Time">One Time</option>
+              </select>
+            </td>
+            <td id="add-child-status">{{ row_data['Child Status'] }}</td>
+            <td id="add-family-status">{{ row_data['Family Status'] }}</td>
+            <td id="add-billing-cycle">{{ row_data['Billing Cycle'] }}</td>
+            <td>
+              <button type="submit" name="save_add" class="btn-save">Save</button>
+              <button type="submit" name="cancel_action" class="btn-cancel">Cancel</button>
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if mode != 'add' %}
+      <button type="submit" name="add_row_mode" value="1" class="btn-add">➕ Add Row</button>
+    {% endif %}
+  </form>
+
+  <!-- JS -->
+  <script>
+    const centerChildren = {{ center_children | tojson | safe }};
+    const childDetails = {{ child_details | tojson | safe }};
+
+    function filterChildren(mode) {
+      const centerDropdown = document.getElementById(mode === 'add' ? "add-center-dropdown" : "edit-center-dropdown");
+      const selectedCenter = centerDropdown.value;
+      const childDropdown = document.getElementById(mode === 'add' ? "add-child-dropdown" : "edit-child-dropdown");
+      childDropdown.innerHTML = "";
+      if (centerChildren[selectedCenter]) {
+        centerChildren[selectedCenter].forEach(s => {
+          const opt = document.createElement('option');
+          opt.value = s;
+          opt.text = s;
+          childDropdown.appendChild(opt);
+        });
+      }
+      updateAutoFields(mode);
+    }
+
+    function updateAutoFields(mode) {
+      const centerDropdown = document.getElementById(mode === 'add' ? "add-center-dropdown" : "edit-center-dropdown");
+      const childDropdown = document.getElementById(mode === 'add' ? "add-child-dropdown" : "edit-child-dropdown");
+      if (!centerDropdown || !childDropdown) return;
+
+      const key = centerDropdown.value + "|||" + childDropdown.value;
+      const info = childDetails[key] || {};
+      document.getElementById(mode + "-child-status").innerText = info["Child Status"] || "";
+      document.getElementById(mode + "-family-status").innerText = info["Family Status"] || "";
+      document.getElementById(mode + "-billing-cycle").innerText = info["Billing Cycle"] || "";
+    }
+
+    {% if mode == 'add' %}
+      filterChildren('add');
+    {% elif mode == 'edit' %}
+      filterChildren('edit');
+    {% endif %}
+  </script>
+</body>
+</html>

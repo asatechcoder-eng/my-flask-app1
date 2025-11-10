@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Table</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #888;
+      padding: 6px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    form {
+      margin: 0;
+    }
+    button {
+      margin: 2px;
+      padding: 4px 10px;
+    }
+  </style>
+</head>
+<body>
+
+  {% if msg %}
+    <p style="color: green;">{{ msg }}</p>
+  {% endif %}
+
+  <h2>Data Table</h2>
+
+  {% if data is not none and data.shape[0] > 0 %}
+  <table>
+    <tr>
+      {% for col in data.columns %}
+        <th>{{ col }}</th>
+      {% endfor %}
+      <th>Actions</th>
+    </tr>
+    {% for idx, row in data.iterrows() %}
+    <tr>
+      {% for col in data.columns %}
+        <td>{{ row[col] }}</td>
+      {% endfor %}
+      <td>
+        <!-- Edit Form -->
+        <form method="post" style="display:inline;">
+          <input type="hidden" name="edit_row_idx" value="{{ idx }}">
+          <button type="submit">Edit</button>
+        </form>
+
+        <!-- Delete Form -->
+        <form method="post" style="display:inline;" onsubmit="return confirm('Delete this row?');">
+          <input type="hidden" name="delete_row_idx" value="{{ idx }}">
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+    <p>No data available.</p>
+  {% endif %}
+
+  {% if not show_form %}
+    <form method="post">
+      <button type="submit" name="show_form" value="1">Add Row</button>
+    </form>
+  {% endif %}
+
+  {% if show_form %}
+    <h1>{% if edit_row %}Edit{% else %}Add New{% endif %} Entry</h1>
+    <form method="post">
+      <label>UID:</label>
+      <input type="text" name="UID" required value="{{ edit_row['UID'] if edit_row else '' }}"><br>
+
+      <label>Center Name:</label>
+      <select name="Center_Name" required>
+        {% for center in centers %}
+          <option value="{{ center }}" {% if edit_row and edit_row['Center Name'] == center %}selected{% endif %}>{{ center }}</option>
+        {% endfor %}
+      </select><br>
+
+      <label>Student Name:</label>
+      <select name="Student_Name" required>
+        {% for student in students %}
+          <option value="{{ student }}" {% if edit_row and edit_row['Student Name'] == student %}selected{% endif %}>{{ student }}</option>
+        {% endfor %}
+      </select><br>
+
+      <label>Adjustment Amount:</label>
+      <input type="number" name="Adjustment_Amount" step="0.01" required value="{{ edit_row['Adjustment Amount'] if edit_row else '' }}"><br>
+
+      <label>Note/Description:</label>
+      <input type="text" name="Note" value="{{ edit_row['Note/Description'] if edit_row else '' }}"><br>
+
+      <label>Pulling Instruction:</label>
+      <input type="text" name="Pulling_Instruction" value="{{ edit_row['Pulling Instruction'] if edit_row else '' }}"><br>
+
+      <label>Pulling Category:</label>
+      <select name="Pulling_Category" required>
+        <option value="pull" {% if edit_row and edit_row['Pulling Category']=='pull' %}selected{% endif %}>pull</option>
+        <option value="don't pull" {% if edit_row and edit_row['Pulling Category']=="don't pull" %}selected{% endif %}>don't pull</option>
+      </select><br>
+
+      <label>Start Date:</label>
+      <input type="date" name="Start_Date" value="{{ edit_row['Start Date'] if edit_row else '' }}"><br>
+
+      <label>End Date:</label>
+      <input type="date" name="End_Date" value="{{ edit_row['End Date'] if edit_row else '' }}"><br>
+
+      <label>Adjustment is Recurring:</label>
+      <select name="Is_Recurring">
+        <option value="Yes" {% if edit_row and edit_row['Adjustment is Recurring']=='Yes' %}selected{% endif %}>Yes</option>
+        <option value="No" {% if edit_row and edit_row['Adjustment is Recurring']=='No' %}selected{% endif %}>No</option>
+      </select><br>
+
+      <label>Child Status:</label>
+      <input type="text" name="Child_Status" value="{{ edit_row['Child Status'] if edit_row else '' }}"><br>
+
+      <label>Family Status:</label>
+      <input type="text" name="Family_Status" value="{{ edit_row['Family Status'] if edit_row else '' }}"><br>
+
+      <label>Billing Cycle:</label>
+      <input type="text" name="Billing_Cycle" value="{{ edit_row['Billing Cycle'] if edit_row else '' }}"><br>
+
+      {% if edit_row %}
+        <input type="hidden" name="row_idx" value="{{ edit_row['row_idx'] }}">
+        <button type="submit" name="submit_edit" value="1">Save Edit</button>
+      {% else %}
+        <button type="submit" name="submit_row" value="1">Submit</button>
+      {% endif %}
+    </form>
+  {% endif %}
+
+</body>
+</html>
